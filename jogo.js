@@ -22,7 +22,9 @@ function jogarTabuleiro(linha, coluna, char, tabuleiro){
         result.push([...e])
     }
 
-    if(result[linha][coluna] !== '#') return null //retorna null se não for possível inserir jogada
+    if(result[linha][coluna] !== '#') {
+        return null
+    } //retorna null caso não seja possível inserir jogada
 
     result[linha][coluna] = char.toUpperCase();
     return result
@@ -85,8 +87,16 @@ async function pergunta(){
         let vitoria;
 
         imprimirTabuleiro(tabuleiro)
-        const pos1 = await input('[O] Qual posição deseja jogar (Linha Coluna)? ')
-        tabuleiro = jogarTabuleiro(...pos1.replace(' ', '').split(''), 'O', tabuleiro)
+        while(true) {
+            const pos1 = await input('[O] Qual posição deseja jogar (Linha Coluna)? ')
+            let new_tabuleiro = jogarTabuleiro(...pos1.replace(/\s/g, '').split(''), 'O', tabuleiro)
+            if (new_tabuleiro != null) {
+                tabuleiro = new_tabuleiro
+                break
+            }
+            console.log('Jogada Impossível!')
+            console.log(tabuleiro)
+        }
         vitoria = verificarVitoria(tabuleiro)
 
         if(vitoria) {
@@ -95,10 +105,17 @@ async function pergunta(){
         }
 
         imprimirTabuleiro(tabuleiro)
-        const pos2 = await input('[X] Qual posição deseja jogar (Linha Coluna)? ')
-        tabuleiro = jogarTabuleiro(...pos2.replace(' ', '').split(''), 'X', tabuleiro)
+        while(true) {
+            const pos2 = await input('[X] Qual posição deseja jogar (Linha Coluna)? ')
+            let new_tabuleiro = jogarTabuleiro(...pos2.replace(/\s/g, '').split(''), 'X', tabuleiro)
+            if (new_tabuleiro != null) {
+                tabuleiro = new_tabuleiro
+                break
+            }
+            console.log('Jogada Impossível!')
+            console.log(tabuleiro)
+        }
         vitoria = verificarVitoria(tabuleiro)
-
 
         if(vitoria) {
             console.log(`VENCEDOR: ${vitoria}`)
