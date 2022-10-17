@@ -9,7 +9,7 @@ function imprimirTabuleiro(tabuleiro){
     tabuleiro.forEach((linha, i, a) => {
         process.stdout.write('|')
         linha.forEach(e => {
-            process.stdout.write(` ${e} ` +'|');
+            process.stdout.write(` ${e ? e: '#'} ` +'|');
         })
         console.log( i === a.length-1 ? '\n-------------': '\n|---|---|---|')
     })
@@ -29,7 +29,7 @@ function jogarTabuleiro(linha, coluna, char, tabuleiro){
         result.push([...e])
     }
 
-    if(result[linha][coluna] !== '#') {
+    if(result[linha][coluna] !== null) {
         return null
     } //retorna null caso não seja possível inserir jogada
 
@@ -43,9 +43,10 @@ function jogarTabuleiro(linha, coluna, char, tabuleiro){
  * haja vencedor
  */
 function verificarVitoria(tabuleiro){
+    console.log(tabuleiro)
     //linhas
     for (let i = 0; i < 3; i++) {
-        if(new Set(tabuleiro[i]).size === 1 && tabuleiro[i][0] !== '#'){
+        if(new Set(tabuleiro[i]).size === 1 && tabuleiro[i][0]){
             return tabuleiro[i][0]
         }
     }
@@ -56,7 +57,7 @@ function verificarVitoria(tabuleiro){
         for (let j = 0; j < 3; j++) {
             col.push(tabuleiro[j][i])
         }
-        if(new Set(col).size === 1 && col[0] !== '#'){
+        if(new Set(col).size === 1 && col[0]){
             return col[0]
         }
     }
@@ -66,14 +67,23 @@ function verificarVitoria(tabuleiro){
     for (let i = 0; i < 3; i++) {
         dig.push(tabuleiro[i][i])
     }
-    if(new Set(dig).size === 1 && dig[0] !== '#') return dig[0]
+    if(new Set(dig).size === 1 && dig[0]) return dig[0]
 
     //diagonal secundária
     dig = []
     for (let i = 0; i < 3; i++) {
         dig.push(tabuleiro[i][tabuleiro.length-1-i])
     }
-    if(new Set(dig).size === 1 && dig[0] !== '#') return dig[0]
+    if(new Set(dig).size === 1 && dig[0]) return dig[0]
+}
+
+function deuVelha(tabuleiro){
+    for (const linha of tabuleiro) {
+        for(const e of linha){
+            if(e === null) return false;
+        }
+    }
+    return true;
 }
 
 function input(texto=''){
@@ -90,7 +100,7 @@ let tabuleiro = []
 for (let i = 0; i < 3; i++) {
     tabuleiro.push([])
     for (let j = 0; j < 3; j++) {
-        tabuleiro[i].push('#')
+        tabuleiro[i].push(null)
     }
 }
 
@@ -123,6 +133,11 @@ async function jogo(){
         if(vitoria) {
             console.log(`VENCEDOR: ${vitoria}`)
             break
+        }
+
+        if(deuVelha(tabuleiro)){
+            console.log("DEU VELHA!")
+            break;
         }
 
         jogadorAtual = jogadorAtual === 'O' ? 'X' : 'O'
