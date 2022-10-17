@@ -15,6 +15,13 @@ function imprimirTabuleiro(tabuleiro){
     })
 }
 
+
+/**
+ * @param {string|number} linha index da linha
+ * @param {string|number} coluna index da coluna
+ * @param {string} char quem está fazendo a jogada
+ * @param {[]}tabuleiro array 2D do tabuleiro
+ */
 function jogarTabuleiro(linha, coluna, char, tabuleiro){
     const result = []
     //copiar tabuleiro
@@ -30,6 +37,11 @@ function jogarTabuleiro(linha, coluna, char, tabuleiro){
     return result
 }
 
+/**
+ * @param {[]} tabuleiro array 2D do tabuleiro
+ * @return retorna undefined caso não há nenhuma condição de vitória. Retorna o char vencedor ('X' ou 'O') caso
+ * haja vencedor
+ */
 function verificarVitoria(tabuleiro){
     //linhas
     for (let i = 0; i < 3; i++) {
@@ -82,20 +94,29 @@ for (let i = 0; i < 3; i++) {
     }
 }
 
-async function pergunta(){
+async function jogo(){
+    let jogadorAtual = 'O'
     while(true) {
         let vitoria;
 
         imprimirTabuleiro(tabuleiro)
         while(true) {
-            const pos1 = await input('[O] Qual posição deseja jogar (Linha Coluna)? ')
-            let new_tabuleiro = jogarTabuleiro(...pos1.replace(/\s/g, '').split(''), 'O', tabuleiro)
+            const pos = await input(`[${jogadorAtual}] Qual posição deseja jogar (Linha Coluna)? `)
+
+            //validar input
+            if(pos.replace(/\s/g, '').split('').length !== 2) {
+                console.log("Jogada Impossível!")
+                continue;
+            }
+
+            //validar jogada
+            let new_tabuleiro = jogarTabuleiro(...pos.replace(/\s/g, '').split(''), jogadorAtual, tabuleiro)
             if (new_tabuleiro != null) {
                 tabuleiro = new_tabuleiro
                 break
             }
+
             console.log('Jogada Impossível!')
-            console.log(tabuleiro)
         }
         vitoria = verificarVitoria(tabuleiro)
 
@@ -104,24 +125,8 @@ async function pergunta(){
             break
         }
 
-        imprimirTabuleiro(tabuleiro)
-        while(true) {
-            const pos2 = await input('[X] Qual posição deseja jogar (Linha Coluna)? ')
-            let new_tabuleiro = jogarTabuleiro(...pos2.replace(/\s/g, '').split(''), 'X', tabuleiro)
-            if (new_tabuleiro != null) {
-                tabuleiro = new_tabuleiro
-                break
-            }
-            console.log('Jogada Impossível!')
-            console.log(tabuleiro)
-        }
-        vitoria = verificarVitoria(tabuleiro)
-
-        if(vitoria) {
-            console.log(`VENCEDOR: ${vitoria}`)
-            break
-        }
+        jogadorAtual = jogadorAtual === 'O' ? 'X' : 'O'
     }
 }
 
-pergunta()
+jogo()
