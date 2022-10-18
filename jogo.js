@@ -1,10 +1,15 @@
+/* FAZER
+* Melhorar validação do input
+* Generalizar função de imprimir tabuleiro
+* Deixar função perguntar mais arrumada
+* */
+
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
 function imprimirTabuleiro(tabuleiro){
-    //FAZER - GENERALIZAR ESSA FUNÇÃO
     console.log('-------------')
     tabuleiro.forEach((linha, i, a) => {
         process.stdout.write('|')
@@ -23,11 +28,7 @@ function imprimirTabuleiro(tabuleiro){
  * @param {[]}tabuleiro array 2D do tabuleiro
  */
 function jogarTabuleiro(linha, coluna, char, tabuleiro){
-    const result = []
-    //copiar tabuleiro
-    for (const e of tabuleiro) {
-        result.push([...e])
-    }
+    const result = copyTabuleiro(tabuleiro)
 
     if(result[linha][coluna] !== null) {
         return null
@@ -43,7 +44,6 @@ function jogarTabuleiro(linha, coluna, char, tabuleiro){
  * haja vencedor
  */
 function verificarVitoria(tabuleiro){
-    console.log(tabuleiro)
     //linhas
     for (let i = 0; i < 3; i++) {
         if(new Set(tabuleiro[i]).size === 1 && tabuleiro[i][0]){
@@ -94,6 +94,16 @@ function input(texto=''){
     })
 }
 
+function copyTabuleiro(tabuleiro){
+    const result = []
+    //copiar tabuleiro
+    for (const e of tabuleiro) {
+        result.push([...e])
+    }
+
+    return result
+}
+
 let tabuleiro = []
 
 //gerar tabuleiro
@@ -104,6 +114,8 @@ for (let i = 0; i < 3; i++) {
     }
 }
 
+let historicTabuleiro = [copyTabuleiro(tabuleiro)]
+
 async function jogo(){
     let jogadorAtual = 'O'
     while(true) {
@@ -111,9 +123,17 @@ async function jogo(){
 
         imprimirTabuleiro(tabuleiro)
         while(true) {
-            const pos = await input(`[${jogadorAtual}] Qual posição deseja jogar (Linha Coluna)? `)
+            const pos = await input(`[${jogadorAtual}] Qual posição deseja jogar (LINHA COLUNA ou -QUANTIDADE_DE_JOGADAS_PARA_VOLTAR)?`)
 
             //validar input
+            if(pos.startsWith('-')){
+                const voltar = Number.parseInt(pos.replace('-', ''))
+                console.log(`Voltando ${voltar} jogadas...`)
+                console.log(historicTabuleiro[historicTabuleiro.length-voltar])
+                tabuleiro = copyTabuleiro(historicTabuleiro[historicTabuleiro.length-voltar])
+                historicTabuleiro = historicTabuleiro.slice(0, tabuleiro.length-voltar-1)
+                break
+            }
             if(pos.replace(/\s/g, '').split('').length !== 2) {
                 console.log("Jogada Impossível!")
                 continue;
@@ -122,6 +142,7 @@ async function jogo(){
             //validar jogada
             let new_tabuleiro = jogarTabuleiro(...pos.replace(/\s/g, '').split(''), jogadorAtual, tabuleiro)
             if (new_tabuleiro != null) {
+                historicTabuleiro.push(copyTabuleiro(tabuleiro))
                 tabuleiro = new_tabuleiro
                 break
             }
@@ -132,11 +153,13 @@ async function jogo(){
 
         if(vitoria) {
             console.log(`VENCEDOR: ${vitoria}`)
+            imprimirTabuleiro(tabuleiro)
             break
         }
 
-        if(deuVelha(tabuleiro)){
+        else if(deuVelha(tabuleiro)){
             console.log("DEU VELHA!")
+            imprimirTabuleiro(tabuleiro)
             break;
         }
 
