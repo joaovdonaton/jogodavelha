@@ -114,24 +114,31 @@ for (let i = 0; i < 3; i++) {
     }
 }
 
-let historicTabuleiro = [copyTabuleiro(tabuleiro)]
+let historicTabuleiro = []
 
 async function jogo(){
     let jogadorAtual = 'O'
-    while(true) {
+    while(true) { //realizar prompt de jogada e ir para o próximo jogador a cada loop
         let vitoria;
 
         imprimirTabuleiro(tabuleiro)
         while(true) {
+
             const pos = await input(`[${jogadorAtual}] Qual posição deseja jogar (LINHA COLUNA ou -QUANTIDADE_DE_JOGADAS_PARA_VOLTAR)?`)
 
             //validar input
             if(pos.startsWith('-')){
                 const voltar = Number.parseInt(pos.replace('-', ''))
-                console.log(`Voltando ${voltar} jogadas...`)
-                console.log(historicTabuleiro[historicTabuleiro.length-voltar])
-                tabuleiro = copyTabuleiro(historicTabuleiro[historicTabuleiro.length-voltar])
-                historicTabuleiro = historicTabuleiro.slice(0, tabuleiro.length-voltar-1)
+
+                if(voltar > historicTabuleiro.length){
+                    console.log(`Não é possível voltar ${voltar} jogadas, pois só foram feitas ${historicTabuleiro.length} jogadas`)
+                }
+
+                else {
+                    console.log(`Voltando ${voltar} jogadas...`)
+                    tabuleiro = copyTabuleiro(historicTabuleiro[historicTabuleiro.length - voltar])
+                    historicTabuleiro = historicTabuleiro.slice(0, historicTabuleiro.length - voltar)
+                }
                 break
             }
             if(pos.replace(/\s/g, '').split('').length !== 2) {
