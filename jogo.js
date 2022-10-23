@@ -2,6 +2,8 @@
 * Melhorar validação do input
 * Generalizar função de imprimir tabuleiro
 * Deixar função perguntar mais arrumada
+* generalizar programa inteiro para que funcione com tabuleiro NxN, para qualquer N
+* Perguntar se devo colocar o tabuleiro e suas funções em um object
 * */
 
 const readline = require('readline').createInterface({
@@ -104,6 +106,20 @@ function copyTabuleiro(tabuleiro){
     return result
 }
 
+function jogadasDisponiveis(tabuleiro){
+    const result = []
+
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            if(!tabuleiro[i][j]){
+                result.push([i,j])
+            }
+        }
+    }
+
+    return result
+}
+
 let tabuleiro = []
 
 //gerar tabuleiro
@@ -117,44 +133,62 @@ for (let i = 0; i < 3; i++) {
 let historicTabuleiro = []
 
 async function jogo(){
-    let jogadorAtual = 'O'
+    console.log("-------------JOGO DA VELHA-------------")
+    console.log("[1] Jogador X Jogador")
+    console.log("[2] Jogador X Computador")
+    console.log("[3] Tutorial")
+
+    const opcao = await input('Escolha uma opção: ')
+
+    let jogadorAtual = 'X'
     while(true) { //realizar prompt de jogada e ir para o próximo jogador a cada loop
         let vitoria;
 
         imprimirTabuleiro(tabuleiro)
-        while(true) {
 
-            const pos = await input(`[${jogadorAtual}] Qual posição deseja jogar (LINHA COLUNA ou -QUANTIDADE_DE_JOGADAS_PARA_VOLTAR)?`)
+        if(opcao === '2' && jogadorAtual === 'O'){ //fazer jogada do bot
+            const jogadasDisp = jogadasDisponiveis(tabuleiro)
+            const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
 
-            //validar input
-            if(pos.startsWith('-')){
-                const voltar = Number.parseInt(pos.replace('-', ''))
-
-                if(voltar > historicTabuleiro.length){
-                    console.log(`Não é possível voltar ${voltar} jogadas, pois só foram feitas ${historicTabuleiro.length} jogadas`)
-                }
-
-                else {
-                    console.log(`Voltando ${voltar} jogadas...`)
-                    tabuleiro = copyTabuleiro(historicTabuleiro[historicTabuleiro.length - voltar])
-                    historicTabuleiro = historicTabuleiro.slice(0, historicTabuleiro.length - voltar)
-                }
-                break
-            }
-            if(pos.replace(/\s/g, '').split('').length !== 2) {
-                console.log("Jogada Impossível!")
-                continue;
-            }
-
-            //validar jogada
-            let new_tabuleiro = jogarTabuleiro(...pos.replace(/\s/g, '').split(''), jogadorAtual, tabuleiro)
+            let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
             if (new_tabuleiro != null) {
                 historicTabuleiro.push(copyTabuleiro(tabuleiro))
                 tabuleiro = new_tabuleiro
-                break
             }
+        }
+        else {
+            while (true) {
 
-            console.log('Jogada Impossível!')
+                const pos = await input(`[${jogadorAtual}] Qual posição deseja jogar (LINHA COLUNA ou -QUANTIDADE_DE_JOGADAS_PARA_VOLTAR)?`)
+
+                //validar input
+                if (pos.startsWith('-')) {
+                    const voltar = Number.parseInt(pos.replace('-', ''))
+
+                    if (voltar > historicTabuleiro.length) {
+                        console.log(`Não é possível voltar ${voltar} jogadas, pois só foram feitas ${historicTabuleiro.length} jogadas`)
+                    } else {
+                        console.log(`Voltando ${voltar} jogadas...`)
+                        tabuleiro = copyTabuleiro(historicTabuleiro[historicTabuleiro.length - voltar])
+                        historicTabuleiro = historicTabuleiro.slice(0, historicTabuleiro.length - voltar)
+                    }
+                    break
+                }
+                if (pos.replace(/\s/g, '').split('').length !== 2) {
+                    console.log("Jogada Impossível!")
+                    continue;
+                }
+
+                //validar jogada
+                let new_tabuleiro = jogarTabuleiro(...pos.replace(/\s/g, '').split(''), jogadorAtual, tabuleiro)
+                if (new_tabuleiro != null) {
+                    historicTabuleiro.push(copyTabuleiro(tabuleiro))
+                    tabuleiro = new_tabuleiro
+                    break
+                }
+
+                console.log('Jogada Impossível!')
+            }
         }
         vitoria = verificarVitoria(tabuleiro)
 
@@ -175,3 +209,4 @@ async function jogo(){
 }
 
 jogo()
+
