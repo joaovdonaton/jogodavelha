@@ -130,7 +130,7 @@ for (let i = 0; i < 3; i++) {
 }
 
 let historicTabuleiro = []
-const BOT = 'BOT2';
+const BOT = 'BOT3';
 
 async function jogo(){
     console.log("-------------JOGO DA VELHA-------------")
@@ -161,7 +161,7 @@ async function jogo(){
             /*
             * faz uma jogada se ela for vencer pra ele, caso contrário, jogada aleatória
             * */
-            else if(BOT === 'BOT2'){
+            else if(BOT === 'BOT2' || BOT === 'BOT3'){
                 let venci = false;
                 for (const [l, c] of jogadasDisp) {
                     let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
@@ -169,10 +169,27 @@ async function jogo(){
                         historicTabuleiro.push(copyTabuleiro(tabuleiro))
                         tabuleiro = new_tabuleiro
                         venci = true
+                        break
                     }
                 }
 
-                if(!venci){
+                let bloqueado = false;
+                if(!venci) {
+                    if (BOT === 'BOT3') { //bloquear jogada do outro
+                        for (const [l, c] of jogadasDisp) {
+                            let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual === 'O' ? 'X' : 'O', tabuleiro) //outro player
+                            if (verificarVitoria(new_tabuleiro)) {
+                                new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
+                                historicTabuleiro.push(copyTabuleiro(tabuleiro))
+                                tabuleiro = new_tabuleiro
+                                bloqueado = true;
+                                break
+                            }
+                        }
+                    }
+                }
+
+                if(!venci && !bloqueado){
                     const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
 
                     let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
