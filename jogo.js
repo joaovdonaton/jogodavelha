@@ -22,7 +22,6 @@ function imprimirTabuleiro(tabuleiro){
     })
 }
 
-
 /**
  * @param {string|number} linha index da linha
  * @param {string|number} coluna index da coluna
@@ -131,6 +130,7 @@ for (let i = 0; i < 3; i++) {
 }
 
 let historicTabuleiro = []
+const BOT = 'BOT2';
 
 async function jogo(){
     console.log("-------------JOGO DA VELHA-------------")
@@ -148,12 +148,39 @@ async function jogo(){
 
         if(opcao === '2' && jogadorAtual === 'O'){ //fazer jogada do bot
             const jogadasDisp = jogadasDisponiveis(tabuleiro)
-            const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
 
-            let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
-            if (new_tabuleiro != null) {
-                historicTabuleiro.push(copyTabuleiro(tabuleiro))
-                tabuleiro = new_tabuleiro
+            if(BOT === 'RANDOM') {
+                const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
+
+                let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
+                if (new_tabuleiro != null) {
+                    historicTabuleiro.push(copyTabuleiro(tabuleiro))
+                    tabuleiro = new_tabuleiro
+                }
+            }
+            /*
+            * faz uma jogada se ela for vencer pra ele, caso contrário, jogada aleatória
+            * */
+            else if(BOT === 'BOT2'){
+                let venci = false;
+                for (const [l, c] of jogadasDisp) {
+                    let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
+                    if(verificarVitoria(new_tabuleiro)){
+                        historicTabuleiro.push(copyTabuleiro(tabuleiro))
+                        tabuleiro = new_tabuleiro
+                        venci = true
+                    }
+                }
+
+                if(!venci){
+                    const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
+
+                    let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
+                    if (new_tabuleiro != null) {
+                        historicTabuleiro.push(copyTabuleiro(tabuleiro))
+                        tabuleiro = new_tabuleiro
+                    }
+                }
             }
         }
         else {
@@ -209,4 +236,3 @@ async function jogo(){
 }
 
 jogo()
-
