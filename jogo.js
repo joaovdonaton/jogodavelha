@@ -1,11 +1,3 @@
-/* FAZER
-* Melhorar validação do input
-* Generalizar função de imprimir tabuleiro
-* Deixar função perguntar mais arrumada
-* generalizar programa inteiro para que funcione com tabuleiro NxN, para qualquer N
-* Perguntar se devo colocar o tabuleiro e suas funções em um object
-* */
-
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
@@ -24,7 +16,7 @@ const tabuleiro = {
             console.log(i === a.length - 1 ? '\n-------------' : '\n|---|---|---|')
         })
     },
-    jogarTabuleiro: function (linha, coluna, char) {
+    jogar: function (linha, coluna, char) {
         if (this.tabuleiro[linha][coluna] === null) {
             this.historico.push(this.copyTabuleiro(this.tabuleiro))
             this.tabuleiro[linha][coluna] = char;
@@ -97,7 +89,7 @@ const tabuleiro = {
     },
     simularJogada: function (l, c, char){
         const copia = this.copyTabuleiro(this.tabuleiro)
-        this.jogarTabuleiro(l, c, char)
+        this.jogar(l, c, char)
         this.historico.pop() //remover jogada simulada do historico
         const vitoria = this.verificarVitoria()
         this.tabuleiro = copia
@@ -125,10 +117,17 @@ async function jogo() {
     console.log("-------------JOGO DA VELHA-------------")
     console.log("[1] Jogador X Jogador")
     console.log("[2] Jogador X Computador")
-    console.log("[3] Tutorial")
 
     const opcao = await input('Escolha uma opção: ')
 
+
+    console.log(`-------------COMO JOGAR-----------
+Digite a linha e a coluna (começando em zero): 
+exemplo: 10 (linha 2, coluna 1)
+
+Ou digite - (menos) seguido da quantidade de jogadas que deseja voltar, para voltar no tempo
+exemplo: -5 (voltar 5 jogadas)
+---------------------------------------------`)
     if (opcao === '2') {
         console.log("[1] Easy")
         console.log("[2] Normal")
@@ -150,7 +149,7 @@ async function jogo() {
             if (dificuldade === 'EASY') {
                 const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
 
-                tabuleiro.jogarTabuleiro(l, c, jogadorAtual)
+                tabuleiro.jogar(l, c, jogadorAtual)
             }
             /*
             * faz uma jogada se ela for vencer pro bot, caso contrário, jogada aleatória (ou bloquear jogada no hard)
@@ -159,7 +158,7 @@ async function jogo() {
                 let venci = false;
                 for (const [l, c] of jogadasDisp) {
                     if(tabuleiro.simularJogada(l, c, jogadorAtual)){
-                        tabuleiro.jogarTabuleiro(l, c, jogadorAtual)
+                        tabuleiro.jogar(l, c, jogadorAtual)
                         venci = true
                         break
                     }
@@ -170,7 +169,7 @@ async function jogo() {
                     if (dificuldade === 'HARD') { //bloquear jogada do outro
                         for (const [l, c] of jogadasDisp) {
                             if(tabuleiro.simularJogada(l, c, jogadorAtual === 'O' ? 'X' : 'O', tabuleiro)){
-                                tabuleiro.jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
+                                tabuleiro.jogar(l, c, jogadorAtual, tabuleiro)
                                 bloqueado = true;
                                 break;
                             }
@@ -181,7 +180,7 @@ async function jogo() {
                 if (!venci && !bloqueado) {
                     const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
 
-                    tabuleiro.jogarTabuleiro(l, c, jogadorAtual)
+                    tabuleiro.jogar(l, c, jogadorAtual)
                 }
             }
         } else {
@@ -209,7 +208,7 @@ async function jogo() {
                 }
 
                 //validar jogada
-                if(!tabuleiro.jogarTabuleiro(...pos.replace(/\s/g, '').split(''), jogadorAtual)) console.log('Jogada Impossível!')
+                if(!tabuleiro.jogar(...pos.replace(/\s/g, '').split(''), jogadorAtual)) console.log('Jogada Impossível!')
                 else{break}
             }
         }
