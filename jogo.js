@@ -130,7 +130,12 @@ for (let i = 0; i < 3; i++) {
 }
 
 let historicTabuleiro = []
-const BOT = 'BOT3';
+const dificuldades = {
+    0: 'EASY',
+    1: 'NORMAL',
+    2: 'HARD'
+}
+let dificuldade = 'EASY';
 
 async function jogo(){
     console.log("-------------JOGO DA VELHA-------------")
@@ -139,6 +144,14 @@ async function jogo(){
     console.log("[3] Tutorial")
 
     const opcao = await input('Escolha uma opção: ')
+
+    if(opcao === '2'){
+        console.log("[1] Easy")
+        console.log("[2] Normal")
+        console.log("[3] Hard")
+
+        dificuldade = dificuldades[parseInt(await input('Escolha uma opção: '))-1]
+    }
 
     let jogadorAtual = 'X'
     while(true) { //realizar prompt de jogada e ir para o próximo jogador a cada loop
@@ -149,7 +162,7 @@ async function jogo(){
         if(opcao === '2' && jogadorAtual === 'O'){ //fazer jogada do bot
             const jogadasDisp = jogadasDisponiveis(tabuleiro)
 
-            if(BOT === 'RANDOM') {
+            if(dificuldade === 'EASY') {
                 const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
 
                 let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
@@ -161,7 +174,7 @@ async function jogo(){
             /*
             * faz uma jogada se ela for vencer pra ele, caso contrário, jogada aleatória
             * */
-            else if(BOT === 'BOT2' || BOT === 'BOT3'){
+            else if(dificuldade === 'NORMAL' || dificuldade === 'HARD'){
                 let venci = false;
                 for (const [l, c] of jogadasDisp) {
                     let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
@@ -175,7 +188,7 @@ async function jogo(){
 
                 let bloqueado = false;
                 if(!venci) {
-                    if (BOT === 'BOT3') { //bloquear jogada do outro
+                    if (dificuldade === 'HARD') { //bloquear jogada do outro
                         for (const [l, c] of jogadasDisp) {
                             let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual === 'O' ? 'X' : 'O', tabuleiro) //outro player
                             if (verificarVitoria(new_tabuleiro)) {
