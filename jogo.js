@@ -11,83 +11,102 @@ const readline = require('readline').createInterface({
     output: process.stdout
 });
 
-function imprimirTabuleiro(tabuleiro){
-    console.log('-------------')
-    tabuleiro.forEach((linha, i, a) => {
-        process.stdout.write('|')
-        linha.forEach(e => {
-            process.stdout.write(` ${e ? e: '#'} ` +'|');
+const tabuleiro = {
+    tabuleiro: [[null, null, null], [null, null, null], [null, null, null]],
+    historico: [],
+    imprimir: function () {
+        console.log('-------------')
+        this.tabuleiro.forEach((linha, i, a) => {
+            process.stdout.write('|')
+            linha.forEach(e => {
+                process.stdout.write(` ${e ? e : '#'} ` + '|');
+            })
+            console.log(i === a.length - 1 ? '\n-------------' : '\n|---|---|---|')
         })
-        console.log( i === a.length-1 ? '\n-------------': '\n|---|---|---|')
-    })
+    },
+    jogarTabuleiro: function (linha, coluna, char) {
+        if (this.tabuleiro[linha][coluna] === null) {
+            this.historico.push(this.copyTabuleiro(this.tabuleiro))
+            this.tabuleiro[linha][coluna] = char;
+            return true
+        }
+
+        return false
+    },
+    verificarVitoria: function () {
+        //linhas
+        for (let i = 0; i < 3; i++) {
+            if (new Set(this.tabuleiro[i]).size === 1 && this.tabuleiro[i][0]) {
+                return this.tabuleiro[i][0]
+            }
+        }
+
+        //colunas
+        for (let i = 0; i < 3; i++) {
+            const col = []
+            for (let j = 0; j < 3; j++) {
+                col.push(this.tabuleiro[j][i])
+            }
+            if (new Set(col).size === 1 && col[0]) {
+                return col[0]
+            }
+        }
+
+        //diagonal principal
+        let dig = []
+        for (let i = 0; i < 3; i++) {
+            dig.push(this.tabuleiro[i][i])
+        }
+        if (new Set(dig).size === 1 && dig[0]) return dig[0]
+
+        //diagonal secundária
+        dig = []
+        for (let i = 0; i < 3; i++) {
+            dig.push(this.tabuleiro[i][this.tabuleiro.length - 1 - i])
+        }
+        if (new Set(dig).size === 1 && dig[0]) return dig[0]
+    },
+    deuVelha: function () {
+        for (const linha of this.tabuleiro) {
+            for (const e of linha) {
+                if (e === null) return false;
+            }
+        }
+        return true;
+    },
+    copyTabuleiro: function (t) {
+        const result = []
+        for (const e of t) {
+            result.push([...e])
+        }
+
+        return result
+    },
+    jogadasDisponiveis: function () {
+        const result = []
+
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (!this.tabuleiro[i][j]) {
+                    result.push([i, j])
+                }
+            }
+        }
+
+        return result
+    },
+    simularJogada: function (l, c, char){
+        const copia = this.copyTabuleiro(this.tabuleiro)
+        this.jogarTabuleiro(l, c, char)
+        this.historico.pop() //remover jogada simulada do historico
+        const vitoria = this.verificarVitoria()
+        this.tabuleiro = copia
+        return vitoria
+    }
+
 }
 
-/**
- * @param {string|number} linha index da linha
- * @param {string|number} coluna index da coluna
- * @param {string} char quem está fazendo a jogada
- * @param {[]}tabuleiro array 2D do tabuleiro
- */
-function jogarTabuleiro(linha, coluna, char, tabuleiro){
-    const result = copyTabuleiro(tabuleiro)
-
-    if(result[linha][coluna] !== null) {
-        return null
-    } //retorna null caso não seja possível inserir jogada
-
-    result[linha][coluna] = char.toUpperCase();
-    return result
-}
-
-/**
- * @param {[]} tabuleiro array 2D do tabuleiro
- * @return retorna undefined caso não há nenhuma condição de vitória. Retorna o char vencedor ('X' ou 'O') caso
- * haja vencedor
- */
-function verificarVitoria(tabuleiro){
-    //linhas
-    for (let i = 0; i < 3; i++) {
-        if(new Set(tabuleiro[i]).size === 1 && tabuleiro[i][0]){
-            return tabuleiro[i][0]
-        }
-    }
-
-    //colunas
-    for (let i = 0; i < 3; i++) {
-        const col = []
-        for (let j = 0; j < 3; j++) {
-            col.push(tabuleiro[j][i])
-        }
-        if(new Set(col).size === 1 && col[0]){
-            return col[0]
-        }
-    }
-
-    //diagonal principal
-    let dig = []
-    for (let i = 0; i < 3; i++) {
-        dig.push(tabuleiro[i][i])
-    }
-    if(new Set(dig).size === 1 && dig[0]) return dig[0]
-
-    //diagonal secundária
-    dig = []
-    for (let i = 0; i < 3; i++) {
-        dig.push(tabuleiro[i][tabuleiro.length-1-i])
-    }
-    if(new Set(dig).size === 1 && dig[0]) return dig[0]
-}
-
-function deuVelha(tabuleiro){
-    for (const linha of tabuleiro) {
-        for(const e of linha){
-            if(e === null) return false;
-        }
-    }
-    return true;
-}
-
-function input(texto=''){
+function input(texto = '') {
     return new Promise((resolve, reject) => {
         readline.question(texto, (i) => {
             resolve(i)
@@ -95,41 +114,6 @@ function input(texto=''){
     })
 }
 
-function copyTabuleiro(tabuleiro){
-    const result = []
-    //copiar tabuleiro
-    for (const e of tabuleiro) {
-        result.push([...e])
-    }
-
-    return result
-}
-
-function jogadasDisponiveis(tabuleiro){
-    const result = []
-
-    for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-            if(!tabuleiro[i][j]){
-                result.push([i,j])
-            }
-        }
-    }
-
-    return result
-}
-
-let tabuleiro = []
-
-//gerar tabuleiro
-for (let i = 0; i < 3; i++) {
-    tabuleiro.push([])
-    for (let j = 0; j < 3; j++) {
-        tabuleiro[i].push(null)
-    }
-}
-
-let historicTabuleiro = []
 const dificuldades = {
     0: 'EASY',
     1: 'NORMAL',
@@ -137,7 +121,7 @@ const dificuldades = {
 }
 let dificuldade = 'EASY';
 
-async function jogo(){
+async function jogo() {
     console.log("-------------JOGO DA VELHA-------------")
     console.log("[1] Jogador X Jogador")
     console.log("[2] Jogador X Computador")
@@ -145,75 +129,62 @@ async function jogo(){
 
     const opcao = await input('Escolha uma opção: ')
 
-    if(opcao === '2'){
+    if (opcao === '2') {
         console.log("[1] Easy")
         console.log("[2] Normal")
         console.log("[3] Hard")
 
-        dificuldade = dificuldades[parseInt(await input('Escolha uma opção: '))-1]
+        dificuldade = dificuldades[parseInt(await input('Escolha uma opção: ')) - 1]
     }
 
     let jogadorAtual = 'X'
-    while(true) { //realizar prompt de jogada e ir para o próximo jogador a cada loop
+    while (true) { //realizar prompt de jogada e ir para o próximo jogador a cada loop
         let vitoria;
 
-        imprimirTabuleiro(tabuleiro)
+        tabuleiro.imprimir()
 
-        if(opcao === '2' && jogadorAtual === 'O'){ //fazer jogada do bot
-            const jogadasDisp = jogadasDisponiveis(tabuleiro)
+        if (opcao === '2' && jogadorAtual === 'O') { //fazer jogada do bot
+            console.log("Fazendo jogada do bot [O]...")
+            const jogadasDisp = tabuleiro.jogadasDisponiveis()
 
-            if(dificuldade === 'EASY') {
+            if (dificuldade === 'EASY') {
                 const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
 
-                let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
-                if (new_tabuleiro != null) {
-                    historicTabuleiro.push(copyTabuleiro(tabuleiro))
-                    tabuleiro = new_tabuleiro
-                }
+                tabuleiro.jogarTabuleiro(l, c, jogadorAtual)
             }
             /*
-            * faz uma jogada se ela for vencer pra ele, caso contrário, jogada aleatória
+            * faz uma jogada se ela for vencer pro bot, caso contrário, jogada aleatória (ou bloquear jogada no hard)
             * */
-            else if(dificuldade === 'NORMAL' || dificuldade === 'HARD'){
+            else if (dificuldade === 'NORMAL' || dificuldade === 'HARD') {
                 let venci = false;
                 for (const [l, c] of jogadasDisp) {
-                    let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
-                    if(verificarVitoria(new_tabuleiro)){
-                        historicTabuleiro.push(copyTabuleiro(tabuleiro))
-                        tabuleiro = new_tabuleiro
+                    if(tabuleiro.simularJogada(l, c, jogadorAtual)){
+                        tabuleiro.jogarTabuleiro(l, c, jogadorAtual)
                         venci = true
                         break
                     }
                 }
 
                 let bloqueado = false;
-                if(!venci) {
+                if (!venci) {
                     if (dificuldade === 'HARD') { //bloquear jogada do outro
                         for (const [l, c] of jogadasDisp) {
-                            let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual === 'O' ? 'X' : 'O', tabuleiro) //outro player
-                            if (verificarVitoria(new_tabuleiro)) {
-                                new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
-                                historicTabuleiro.push(copyTabuleiro(tabuleiro))
-                                tabuleiro = new_tabuleiro
+                            if(tabuleiro.simularJogada(l, c, jogadorAtual === 'O' ? 'X' : 'O', tabuleiro)){
+                                tabuleiro.jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
                                 bloqueado = true;
-                                break
+                                break;
                             }
                         }
                     }
                 }
 
-                if(!venci && !bloqueado){
+                if (!venci && !bloqueado) {
                     const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
 
-                    let new_tabuleiro = jogarTabuleiro(l, c, jogadorAtual, tabuleiro)
-                    if (new_tabuleiro != null) {
-                        historicTabuleiro.push(copyTabuleiro(tabuleiro))
-                        tabuleiro = new_tabuleiro
-                    }
+                    tabuleiro.jogarTabuleiro(l, c, jogadorAtual)
                 }
             }
-        }
-        else {
+        } else {
             while (true) {
 
                 const pos = await input(`[${jogadorAtual}] Qual posição deseja jogar (LINHA COLUNA ou -QUANTIDADE_DE_JOGADAS_PARA_VOLTAR)?`)
@@ -222,14 +193,15 @@ async function jogo(){
                 if (pos.startsWith('-')) {
                     const voltar = Number.parseInt(pos.replace('-', ''))
 
-                    if (voltar > historicTabuleiro.length) {
-                        console.log(`Não é possível voltar ${voltar} jogadas, pois só foram feitas ${historicTabuleiro.length} jogadas`)
+                    if (voltar > tabuleiro.historico.length) {
+                        console.log(`Não é possível voltar ${voltar} jogadas, pois só foram feitas ${tabuleiro.historico.length} jogadas`)
                     } else {
                         console.log(`Voltando ${voltar} jogadas...`)
-                        tabuleiro = copyTabuleiro(historicTabuleiro[historicTabuleiro.length - voltar])
-                        historicTabuleiro = historicTabuleiro.slice(0, historicTabuleiro.length - voltar)
+                        tabuleiro.tabuleiro = tabuleiro.copyTabuleiro(tabuleiro.historico[tabuleiro.historico.length - voltar])
+                        tabuleiro.historico = tabuleiro.historico.slice(0, tabuleiro.historico.length - voltar)
                     }
-                    break
+                    tabuleiro.imprimir()
+                    continue
                 }
                 if (pos.replace(/\s/g, '').split('').length !== 2) {
                     console.log("Jogada Impossível!")
@@ -237,27 +209,19 @@ async function jogo(){
                 }
 
                 //validar jogada
-                let new_tabuleiro = jogarTabuleiro(...pos.replace(/\s/g, '').split(''), jogadorAtual, tabuleiro)
-                if (new_tabuleiro != null) {
-                    historicTabuleiro.push(copyTabuleiro(tabuleiro))
-                    tabuleiro = new_tabuleiro
-                    break
-                }
-
-                console.log('Jogada Impossível!')
+                if(!tabuleiro.jogarTabuleiro(...pos.replace(/\s/g, '').split(''), jogadorAtual)) console.log('Jogada Impossível!')
+                else{break}
             }
         }
-        vitoria = verificarVitoria(tabuleiro)
+        vitoria = tabuleiro.verificarVitoria()
 
-        if(vitoria) {
+        if (vitoria) {
             console.log(`VENCEDOR: ${vitoria}`)
-            imprimirTabuleiro(tabuleiro)
+            tabuleiro.imprimir()
             break
-        }
-
-        else if(deuVelha(tabuleiro)){
+        } else if (tabuleiro.deuVelha()) {
             console.log("DEU VELHA!")
-            imprimirTabuleiro(tabuleiro)
+            tabuleiro.imprimir()
             break;
         }
 
