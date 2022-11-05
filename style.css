@@ -1,0 +1,40 @@
+#tabuleiro{
+    display: inline-grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 20px;
+}
+
+#tabuleiro div{
+    border: 3px red;
+    padding: 30px;
+    font-size: 2em;
+    background-color: gray;
+    border-radius: 10px;
+}
+
+#tabuleiro div:hover{
+    background-color: darkgray;
+}
+
+#container{
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+    width: 75%;
+    margin: auto;
+}
+
+.menuButton{
+    padding: 10px;
+    background-color: gray;
+    border-radius: 7px;
+}
+
+.menuButton:hover{
+    background-color: darkgray;
+}
+
+#vez{
+    visibility: hidden;
+}

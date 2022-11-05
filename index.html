@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jogo da Velha</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ <div id="container">
+    <h1 id="titulo">JOGO DA VELHA</h1>
+    <div id="menu">
+        <h3>SELECIONE UM MODO DE JOGO:</h3>
+        <button value="jogador" class="menuButton"> Jogador X Jogador</button>
+        <button value="easy" class="menuButton"> Bot Easy</button>
+        <button value="normal" class="menuButton"> Bot Normal</button>
+        <button value="hard" class="menuButton"> Bot Hard</button>
+    </div>
+    <h3 id="vez">VEZ DO JOGADOR: X</h3>
+    <div id="tabuleiro"></div>
+</div>
+<script type='module' src="script.mjs"></script>
+<script type='module' src="tabuleiro.mjs"></script>
+</body>
+</html>
