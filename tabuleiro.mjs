@@ -1,6 +1,10 @@
 const tabuleiro = {
     tabuleiro: [[null, null, null], [null, null, null], [null, null, null]],
     historico: [],
+    reset: function(){
+        this.tabuleiro = [[null, null, null], [null, null, null], [null, null, null]]
+        this.historico = []
+    },
     renderizar: function (tabuleiroElemento) {
         for(let child of tabuleiroElemento.children){
             const [l, c] = [parseInt(child.getAttribute('linha')), parseInt(child.getAttribute('coluna'))]

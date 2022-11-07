@@ -9,6 +9,14 @@ const trocarJogador = () => {
     document.querySelector('#vez').innerText = 'VEZ DO JOGADOR: ' + jogadorAtual
 }
 
+//
+function resetJogo(){
+    tabuleiro.reset()
+    document.querySelector('#vez').style.visibility = 'hidden';
+    document.querySelector('#menu').style.visibility = 'visible';
+    document.querySelector('#tabuleiro').style.visibility = 'hidden';
+}
+
 // gerar nodes do tabuleiro
 const tabuleiroElement = document.querySelector("#tabuleiro")
 tabuleiroElement.style.visibility = 'hidden'; //inicialmente invisivel
@@ -28,8 +36,18 @@ for (let i = 0; i < 3; i++) {
 
                 trocarJogador()
 
+                const vitoria = tabuleiro.verificarVitoria()
+                if (vitoria) {
+                    alert('Jogador ' + vitoria + ' venceu!')
+                    resetJogo()
+                }
+
+                else if(tabuleiro.deuVelha()){
+                    alert('DEU VELHA!')
+                    resetJogo()
+                }
                 //jogada do bot
-                if (jogadorAtual === 'O' && modo !== 'jogador') {
+                else if (jogadorAtual === 'O' && modo !== 'jogador') {
                     const jogadasDisp = tabuleiro.jogadasDisponiveis()
 
                     if (modo === 'easy') {
@@ -71,11 +89,17 @@ for (let i = 0; i < 3; i++) {
                     }
                     tabuleiro.renderizar(tabuleiroElement)
                     trocarJogador()
-                }
 
-                const vitoria = tabuleiro.verificarVitoria()
-                if (vitoria) {
-                    alert('Jogador ' + vitoria + ' venceu!')
+                    const vitoria = tabuleiro.verificarVitoria()
+                    if (vitoria) {
+                        alert('Jogador ' + vitoria + ' venceu!')
+                        resetJogo()
+                    }
+
+                    else if(tabuleiro.deuVelha()){
+                        alert('DEU VELHA!')
+                        resetJogo()
+                    }
                 }
             }
             else {
