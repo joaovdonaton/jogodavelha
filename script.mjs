@@ -15,6 +15,7 @@ function resetJogo(){
     document.querySelector('#vez').style.visibility = 'hidden';
     document.querySelector('#menu').style.visibility = 'visible';
     document.querySelector('#tabuleiro').style.visibility = 'hidden';
+    jogadorAtual = 'X'
 }
 
 // gerar nodes do tabuleiro
