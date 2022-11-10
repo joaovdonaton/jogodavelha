@@ -13,7 +13,7 @@ const trocarJogador = () => {
 function resetJogo(){
     tabuleiro.reset()
     document.querySelector('#vez').style.visibility = 'hidden';
-    document.querySelector('#menu').style.visibility = 'visible';
+    document.querySelector('#menu').style.display = 'flex';
     document.querySelector('#tabuleiro').style.visibility = 'hidden';
     document.querySelector('#voltar').style.visibility = 'hidden';
     jogadorAtual = 'X'
@@ -27,6 +27,7 @@ for (let i = 0; i < 3; i++) {
         const e = document.createElement('div');
         e.setAttribute('linha', i.toString())
         e.setAttribute('coluna', j.toString())
+        e.style.fontWeight = 'bold';
 
         // fazer jogada
         e.addEventListener('click', (event) => {
@@ -136,7 +137,7 @@ voltarForm.onsubmit = (e) => {
     const menuButtons = document.querySelectorAll(".menuButton")
     menuButtons.forEach(e => e.addEventListener('click', (e) => {
         modo = e.target.getAttribute('value')
-        document.querySelector('#menu').style.visibility = 'hidden'
+        document.querySelector('#menu').style.display = 'none'
         tabuleiroElement.style.visibility = 'visible';
         document.querySelector('#voltar').style.visibility = 'visible'
 
