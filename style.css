@@ -38,3 +38,8 @@
 #vez{
     visibility: hidden;
 }
+
+#voltar{
+    visibility: hidden;
+    margin: 10px;
+}

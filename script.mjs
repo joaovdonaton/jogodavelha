@@ -15,6 +15,7 @@ function resetJogo(){
     document.querySelector('#vez').style.visibility = 'hidden';
     document.querySelector('#menu').style.visibility = 'visible';
     document.querySelector('#tabuleiro').style.visibility = 'hidden';
+    document.querySelector('#voltar').style.visibility = 'hidden';
     jogadorAtual = 'X'
 }
 
@@ -33,6 +34,7 @@ for (let i = 0; i < 3; i++) {
             if (tabuleiro.jogar(parseInt(event.target.getAttribute('linha')),
                 parseInt(event.target.getAttribute('coluna')),
                 jogadorAtual)) {
+                //jogada
                 tabuleiro.renderizar(tabuleiroElement)
 
                 trocarJogador()
@@ -106,17 +108,37 @@ for (let i = 0; i < 3; i++) {
             else {
                 alert('Jogada Impossível!')
             }
+
+            //atualizar input de voltas
+            document.querySelector('#voltarNum').setAttribute('max', `${tabuleiro.historico.length}`)
         })
 
         tabuleiroElement.appendChild(e)
     }
 }
+
+//submit do form de voltar
+const voltarForm = document.querySelector('#voltar')
+voltarForm.onsubmit = (e) => {
+    e.preventDefault()
+
+    const voltar = parseInt(document.querySelector('#voltarNum').value)
+
+    tabuleiro.tabuleiro = tabuleiro.copyTabuleiro(tabuleiro.historico[tabuleiro.historico.length - voltar])
+    tabuleiro.historico = tabuleiro.historico.slice(0, tabuleiro.historico.length - voltar)
+    tabuleiro.renderizar(tabuleiroElement)
+
+    //atualizar input de voltas
+    document.querySelector('#voltarNum').setAttribute('max', `${tabuleiro.historico.length}`)
+}
+
 // seleção do modo de jogo
     const menuButtons = document.querySelectorAll(".menuButton")
     menuButtons.forEach(e => e.addEventListener('click', (e) => {
         modo = e.target.getAttribute('value')
         document.querySelector('#menu').style.visibility = 'hidden'
         tabuleiroElement.style.visibility = 'visible';
+        document.querySelector('#voltar').style.visibility = 'visible'
 
         if (modo === 'jogador') {
             document.querySelector('#vez').style.visibility = 'visible'
