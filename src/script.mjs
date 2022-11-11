@@ -1,7 +1,7 @@
 import tabuleiro from "./tabuleiro.mjs";
 
 let modo;
-let jogadorAtual = 'X';
+let jogadorAtual = 'X'; //iniciar com player (O é o bot)
 
 // trocar jogador
 const trocarJogador = () => {
@@ -19,6 +19,28 @@ function resetJogo(){
     jogadorAtual = 'X'
 }
 
+// verificar condições de fim de jogo (vitória ou velha)
+// só consegui fazer funcionar com o setTimeout. Antes parece que o reset acontecia antes dos elementos serem renderizados
+function verificarFim(){
+    const vitoria = tabuleiro.verificarVitoria()
+    if (vitoria) {
+        setTimeout(() => {
+            resetJogo()
+            alert('Jogador ' + vitoria + ' venceu!')
+        }, 100)
+        return true
+    }
+
+    else if(tabuleiro.deuVelha()){
+        setTimeout(() => {
+            resetJogo()
+            alert('DEU VELHA!')
+        }, 100)
+        return true
+    }
+}
+
+
 // gerar nodes do tabuleiro
 const tabuleiroElement = document.querySelector("#tabuleiro")
 tabuleiroElement.style.visibility = 'hidden'; //inicialmente invisivel
@@ -35,23 +57,12 @@ for (let i = 0; i < 3; i++) {
             if (tabuleiro.jogar(parseInt(event.target.getAttribute('linha')),
                 parseInt(event.target.getAttribute('coluna')),
                 jogadorAtual)) {
-                //jogada
                 tabuleiro.renderizar(tabuleiroElement)
 
                 trocarJogador()
 
-                const vitoria = tabuleiro.verificarVitoria()
-                if (vitoria) {
-                    alert('Jogador ' + vitoria + ' venceu!')
-                    resetJogo()
-                }
-
-                else if(tabuleiro.deuVelha()){
-                    alert('DEU VELHA!')
-                    resetJogo()
-                }
                 //jogada do bot
-                else if (jogadorAtual === 'O' && modo !== 'jogador') {
+                if (!verificarFim() && jogadorAtual === 'O' && modo !== 'jogador') {
                     const jogadasDisp = tabuleiro.jogadasDisponiveis()
 
                     if (modo === 'easy') {
@@ -94,16 +105,7 @@ for (let i = 0; i < 3; i++) {
                     tabuleiro.renderizar(tabuleiroElement)
                     trocarJogador()
 
-                    const vitoria = tabuleiro.verificarVitoria()
-                    if (vitoria) {
-                        alert('Jogador ' + vitoria + ' venceu!')
-                        resetJogo()
-                    }
-
-                    else if(tabuleiro.deuVelha()){
-                        alert('DEU VELHA!')
-                        resetJogo()
-                    }
+                    verificarFim()
                 }
             }
             else {
