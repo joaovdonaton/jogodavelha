@@ -5,12 +5,6 @@ const tabuleiro = {
         this.tabuleiro = [[null, null, null], [null, null, null], [null, null, null]]
         this.historico = []
     },
-    renderizar: function (tabuleiroElemento) {
-        for(let child of tabuleiroElemento.children){
-            const [l, c] = [parseInt(child.getAttribute('linha')), parseInt(child.getAttribute('coluna'))]
-            child.innerText = this.tabuleiro[l][c] ? this.tabuleiro[l][c] : ' '
-        }
-    },
     jogar: function (linha, coluna, char) {
         if (this.tabuleiro[linha][coluna] === null) {
             this.historico.push(this.copyTabuleiro(this.tabuleiro))

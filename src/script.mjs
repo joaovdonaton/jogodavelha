@@ -19,6 +19,14 @@ function resetJogo(){
     jogadorAtual = 'X'
 }
 
+//
+function renderizar(){
+    for(let child of document.querySelector('#tabuleiro').children){
+        const [l, c] = [parseInt(child.getAttribute('linha')), parseInt(child.getAttribute('coluna'))]
+        child.innerText = tabuleiro.tabuleiro[l][c] ? tabuleiro.tabuleiro[l][c] : ' '
+    }
+}
+
 // verificar condições de fim de jogo (vitória ou velha)
 // só consegui fazer funcionar com o setTimeout. Antes parece que o reset acontecia antes dos elementos serem renderizados
 function verificarFim(){
@@ -57,7 +65,7 @@ for (let i = 0; i < 3; i++) {
             if (tabuleiro.jogar(parseInt(event.target.getAttribute('linha')),
                 parseInt(event.target.getAttribute('coluna')),
                 jogadorAtual)) {
-                tabuleiro.renderizar(tabuleiroElement)
+                renderizar(tabuleiroElement)
 
                 trocarJogador()
 
@@ -102,7 +110,7 @@ for (let i = 0; i < 3; i++) {
                             tabuleiro.jogar(l, c, jogadorAtual)
                         }
                     }
-                    tabuleiro.renderizar(tabuleiroElement)
+                    renderizar(tabuleiroElement)
                     trocarJogador()
 
                     verificarFim()
@@ -129,7 +137,7 @@ voltarForm.onsubmit = (e) => {
 
     tabuleiro.tabuleiro = tabuleiro.copyTabuleiro(tabuleiro.historico[tabuleiro.historico.length - voltar])
     tabuleiro.historico = tabuleiro.historico.slice(0, tabuleiro.historico.length - voltar)
-    tabuleiro.renderizar(tabuleiroElement)
+    renderizar(tabuleiroElement)
 
     //atualizar input de voltas
     document.querySelector('#voltarNum').setAttribute('max', `${tabuleiro.historico.length}`)
@@ -147,6 +155,6 @@ voltarForm.onsubmit = (e) => {
             document.querySelector('#vez').style.visibility = 'visible'
         }
 
-        tabuleiro.renderizar(tabuleiroElement)
+        renderizar(tabuleiroElement)
     }))
 
