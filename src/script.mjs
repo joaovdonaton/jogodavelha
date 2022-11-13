@@ -10,7 +10,7 @@ const trocarJogador = () => {
 }
 
 //
-function resetJogo(){
+function resetJogo() {
     tabuleiro.reset()
     document.querySelector('#vez').style.visibility = 'hidden';
     document.querySelector('#menu').style.display = 'flex';
@@ -20,8 +20,8 @@ function resetJogo(){
 }
 
 //
-function renderizar(){
-    for(let child of document.querySelector('#tabuleiro').children){
+function renderizar() {
+    for (let child of document.querySelector('#tabuleiro').children) {
         const [l, c] = [parseInt(child.getAttribute('linha')), parseInt(child.getAttribute('coluna'))]
         child.innerText = tabuleiro.tabuleiro[l][c] ? tabuleiro.tabuleiro[l][c] : ' '
     }
@@ -29,23 +29,17 @@ function renderizar(){
 
 // verificar condições de fim de jogo (vitória ou velha)
 // só consegui fazer funcionar com o setTimeout. Antes parece que o reset acontecia antes dos elementos serem renderizados
-function verificarFim(){
-    const vitoria = tabuleiro.verificarVitoria()
-    if (vitoria) {
-        setTimeout(() => {
+function verificarFim() {
+    setTimeout(() => {
+        const vitoria = tabuleiro.verificarVitoria()
+        if (vitoria) {
             resetJogo()
             alert('Jogador ' + vitoria + ' venceu!')
-        }, 100)
-        return true
-    }
-
-    else if(tabuleiro.deuVelha()){
-        setTimeout(() => {
+        } else if (tabuleiro.deuVelha()) {
             resetJogo()
             alert('DEU VELHA!')
-        }, 100)
-        return true
-    }
+        }
+    }, 100)
 }
 
 
@@ -61,7 +55,7 @@ for (let i = 0; i < 3; i++) {
 
         // fazer jogada
         e.addEventListener('click', (event) => {
-            //jogada com sucesso
+            //jogada do player
             if (tabuleiro.jogar(parseInt(event.target.getAttribute('linha')),
                 parseInt(event.target.getAttribute('coluna')),
                 jogadorAtual)) {
@@ -73,16 +67,10 @@ for (let i = 0; i < 3; i++) {
                 if (!verificarFim() && jogadorAtual === 'O' && modo !== 'jogador') {
                     const jogadasDisp = tabuleiro.jogadasDisponiveis()
 
-                    if (modo === 'easy') {
-                        const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
+                    console.log(modo)
 
-                        tabuleiro.jogar(l, c, jogadorAtual)
-                    }
-                    /*
-                    * faz uma jogada se ela for vencer pro bot, caso contrário, jogada aleatória (ou bloquear jogada no hard)
-                    * */
-                    else if (modo === 'normal' || modo === 'hard') {
-                        let venci = false;
+                    let venci = false;
+                    if (modo === "normal" || modo === "hard") {
                         for (const [l, c] of jogadasDisp) {
                             if (tabuleiro.simularJogada(l, c, jogadorAtual)) {
                                 tabuleiro.jogar(l, c, jogadorAtual)
@@ -90,33 +78,31 @@ for (let i = 0; i < 3; i++) {
                                 break
                             }
                         }
+                    }
 
-                        let bloqueado = false;
-                        if (!venci) {
-                            if (modo === 'hard') { //bloquear jogada do outro
-                                for (const [l, c] of jogadasDisp) {
-                                    if (tabuleiro.simularJogada(l, c, jogadorAtual === 'O' ? 'X' : 'O', tabuleiro)) {
-                                        tabuleiro.jogar(l, c, jogadorAtual, tabuleiro)
-                                        bloqueado = true;
-                                        break;
-                                    }
-                                }
+                    let bloqueado = false;
+                    if (modo === 'hard' && !venci) { //bloquear jogada do outro
+                        for (const [l, c] of jogadasDisp) {
+                            if (tabuleiro.simularJogada(l, c, jogadorAtual === 'O' ? 'X' : 'O', tabuleiro)) {
+                                tabuleiro.jogar(l, c, jogadorAtual, tabuleiro)
+                                bloqueado = true;
+                                break;
                             }
                         }
-
-                        if (!venci && !bloqueado) {
-                            const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
-
-                            tabuleiro.jogar(l, c, jogadorAtual)
-                        }
                     }
+
+                    if (!venci && !bloqueado) {
+                        const [l, c] = jogadasDisp[Math.floor(Math.random() * jogadasDisp.length)]
+
+                        tabuleiro.jogar(l, c, jogadorAtual)
+                    }
+
                     renderizar(tabuleiroElement)
                     trocarJogador()
 
                     verificarFim()
                 }
-            }
-            else {
+            } else {
                 alert('Jogada Impossível!')
             }
 
@@ -144,17 +130,17 @@ voltarForm.onsubmit = (e) => {
 }
 
 // seleção do modo de jogo
-    const menuButtons = document.querySelectorAll(".menuButton")
-    menuButtons.forEach(e => e.addEventListener('click', (e) => {
-        modo = e.target.getAttribute('value')
-        document.querySelector('#menu').style.display = 'none'
-        tabuleiroElement.style.visibility = 'visible';
-        document.querySelector('#voltar').style.visibility = 'visible'
+const menuButtons = document.querySelectorAll(".menuButton")
+menuButtons.forEach(e => e.addEventListener('click', (e) => {
+    modo = e.target.getAttribute('value')
+    document.querySelector('#menu').style.display = 'none'
+    tabuleiroElement.style.visibility = 'visible';
+    document.querySelector('#voltar').style.visibility = 'visible'
 
-        if (modo === 'jogador') {
-            document.querySelector('#vez').style.visibility = 'visible'
-        }
+    if (modo === 'jogador') {
+        document.querySelector('#vez').style.visibility = 'visible'
+    }
 
-        renderizar(tabuleiroElement)
-    }))
+    renderizar(tabuleiroElement)
+}))
 
