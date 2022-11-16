@@ -4,9 +4,9 @@
 
 #### Conteúdo: <br>
 
-00:00 apresentação
-02:36 visão geral da implementação
-03:00 tabuleiro.mjs 
-03:57 script.js
-05:12 dificuldades do projeto
-05:50 pontos fortes da implementação e outros detalhes
+00:00 apresentação <br>
+02:36 visão geral da implementação<br>
+03:00 tabuleiro.mjs <br>
+03:57 script.js<br>
+05:12 dificuldades do projeto<br>
+05:50 pontos fortes da implementação e outros detalhes<br>
